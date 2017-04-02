@@ -35,6 +35,12 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         let language = movie["original_language"] as! String
         let title = movie["title"] as! String
         
+        let baseUrl = "http://image.tmdb.org/t/p/w500"
+        let posterPath = movie["poster_path"] as! String
+        let imageUrl = URL(string: (baseUrl + posterPath))
+        //cell.movieImageView.setImageWith(imageUrl! as URL)
+        
+        
         // pass the details
         detailViewController.adult = adult
         detailViewController.released = releaseDate
@@ -42,7 +48,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         detailViewController.votes = votes
         detailViewController.language = language
         detailViewController.movieLabel = title
-        
+        detailViewController.image = imageUrl
     }
     
     

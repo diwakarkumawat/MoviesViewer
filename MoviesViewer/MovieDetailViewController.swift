@@ -15,6 +15,9 @@ class MovieDetailViewController: UIViewController {
     
     @IBOutlet weak var movieTitle: UILabel!
     
+    @IBOutlet weak var detailMovieImage: UIImageView!
+
+    var image: URL!
     
     var adult: Bool?
     var released: String?
@@ -36,6 +39,7 @@ class MovieDetailViewController: UIViewController {
         movieDetailLabel.text = (" Adult: \(adult!) \r Released: \(released!) \r Language: \(language!) \r Popularity: \(popularity!) \r Votes: \(votes!)")
 
         movieTitle.text = movieLabel
+        detailMovieImage.setImageWith(image)
         
     }
 
