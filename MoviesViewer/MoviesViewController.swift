@@ -31,12 +31,14 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         let releaseDate = movie["release_date"] as! String
         let popularity = movie["popularity"] as! Float
         let votes = movie["vote_count"] as! Float
+        let language = movie["original_language"] as! String
         
         // pass the details
         detailViewController.adult = adult
         detailViewController.released = releaseDate
         detailViewController.popularity = popularity
         detailViewController.votes = votes
+        detailViewController.language = language
         
     }
     
