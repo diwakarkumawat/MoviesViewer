@@ -38,8 +38,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         let baseUrl = "http://image.tmdb.org/t/p/w500"
         let posterPath = movie["poster_path"] as! String
         let imageUrl = URL(string: (baseUrl + posterPath))
-        //cell.movieImageView.setImageWith(imageUrl! as URL)
-        
         
         // pass the details
         detailViewController.adult = adult
@@ -69,8 +67,24 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         let overview = movie["overview"] as! String
         let baseUrl = "http://image.tmdb.org/t/p/w500"
         let posterPath = movie["poster_path"] as! String
-        let imageUrl = NSURL(string: baseUrl + posterPath)
-        cell.movieImageView.setImageWith(imageUrl! as URL)
+        // let imageUrl = NSURL(string: baseUrl + posterPath)
+        
+        if let imageUrl = NSURL(string: baseUrl + posterPath) {
+            cell.movieImageView.setImageWith(imageUrl as URL)
+        } else {
+            // photos is nil. network error?
+            let alertController = UIAlertController(title: "Error", message: "No internet connection", preferredStyle: .alert)
+            
+            let OKAction = UIAlertAction(title: "OK", style: .default) { (action:UIAlertAction) in
+                print("You've pressed OK button");
+            }
+            alertController.addAction(OKAction)
+            
+            self.present(alertController, animated: true, completion:nil)
+        }
+        
+        
+        //cell.movieImageView.setImageWith(imageUrl! as URL)
         cell.titleLabel.text = title
         cell.overviewLabel.text = overview
         
