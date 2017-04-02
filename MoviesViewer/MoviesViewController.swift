@@ -32,6 +32,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         let popularity = movie["popularity"] as! Float
         let votes = movie["vote_count"] as! Float
         let language = movie["original_language"] as! String
+        let title = movie["title"] as! String
         
         // pass the details
         detailViewController.adult = adult
@@ -39,6 +40,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         detailViewController.popularity = popularity
         detailViewController.votes = votes
         detailViewController.language = language
+        detailViewController.movieLabel = title
         
     }
     

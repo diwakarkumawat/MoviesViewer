@@ -13,11 +13,15 @@ class MovieDetailViewController: UIViewController {
     
     @IBOutlet weak var movieDetailLabel: UILabel!
     
+    @IBOutlet weak var movieTitle: UILabel!
+    
+    
     var adult: Bool?
     var released: String?
     var language: String?
     var popularity: Float?
     var votes: Float?
+    var movieLabel: String?
     
     
     override func viewDidLoad() {
@@ -29,8 +33,9 @@ class MovieDetailViewController: UIViewController {
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
         
-        movieDetailLabel.text = ("Adult: \(adult!) \r Released: \(released!) \r Language: \(language!) \r Popularity: \(popularity!) \r Votes: \(votes!)")
+        movieDetailLabel.text = (" Adult: \(adult!) \r Released: \(released!) \r Language: \(language!) \r Popularity: \(popularity!) \r Votes: \(votes!)")
 
+        movieTitle.text = movieLabel
         
     }
 
