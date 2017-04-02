@@ -7,21 +7,29 @@
 //
 
 import UIKit
+import AFNetworking
 
 class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     @IBOutlet weak var movieTableView: UITableView!
-
+    
+    var movies: [NSDictionary]?
+    
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int
     {
-        return 10
+        if let movies = movies {
+            return movies.count
+        } else {
+            return 0
+        }
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell
     {
-        
         let cell = movieTableView.dequeueReusableCell(withIdentifier: "MovieCell")!
-        cell.textLabel!.text = "row \(indexPath.row)"
+        let movie = movies![indexPath.row]
+        let title = movie["title"] as! String
+        cell.textLabel!.text = title
         print("row \(indexPath.row)")
         return cell
     }
@@ -32,6 +40,29 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         // Do any additional setup after loading the view.
         movieTableView.dataSource = self
         movieTableView.delegate = self
+        
+        let api_key = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
+        let url = NSURL(string:"https://api.themoviedb.org/3/movie/now_playing?api_key=\(api_key)")
+        let request = NSURLRequest(url: url! as URL)
+        let session = URLSession(
+            configuration: URLSessionConfiguration.default,
+            delegate:nil,
+            delegateQueue:OperationQueue.main
+        )
+        let task: URLSessionDataTask = session.dataTask(with: request as URLRequest,
+                                                                     completionHandler: {
+                (dataOrNil, response, error) in
+                                                                        if let data = dataOrNil {
+                                                                            if let responseDirectory = try! JSONSerialization.jsonObject(
+                                                                                with: data, options: []) as? NSDictionary {
+                                                                                NSLog("response: \(responseDirectory)")
+                                                                                self.movies = responseDirectory["results"] as! [NSDictionary]
+                                                                                self.movieTableView.reloadData()
+                                                                            }
+                                                                        }
+        });
+        task.resume()
+        
     }
 
     override func didReceiveMemoryWarning() {
