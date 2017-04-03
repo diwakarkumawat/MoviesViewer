@@ -9,6 +9,8 @@
 
 import UIKit
 import AFNetworking
+import MBProgressHUD
+
 
 class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating {
     
@@ -90,10 +92,11 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             cell.movieImageView.setImageWith(imageUrl as URL)
         } else {
             // photos is nil. network error?
+            // Implemented using UIAlertController - before reading the requirement again - that it may not be used.
             let alertController = UIAlertController(title: "Error", message: "No internet connection", preferredStyle: .alert)
             
             let OKAction = UIAlertAction(title: "OK", style: .default) { (action:UIAlertAction) in
-                print("You've pressed OK button");
+                print("Ok");
             }
             alertController.addAction(OKAction)
             
@@ -136,15 +139,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             }
         }
 
-        /*
-        for holdMovie in movies as! NSDictionary {
-            let title = holdMovie["title"] as! String
-            if NSString(string: searchString).containsString(title) {
-                filteredMovies?.append(holdMovie)
-            }
-        }
-         */
-        
         self.movieTableView.reloadData()
     }
     
@@ -181,9 +175,14 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             delegate:nil,
             delegateQueue:OperationQueue.main
         )
+        
+        // Display HUD right before the request is made
+        MBProgressHUD.showAdded(to: self.view, animated: true)
+        
         let task: URLSessionDataTask = session.dataTask(with: request as URLRequest,
                                                                      completionHandler: {
                 (dataOrNil, response, error) in
+                                                                        MBProgressHUD.hide(for: self.view, animated: true)
                                                                         if let data = dataOrNil {
                                                                             if let responseDirectory = try! JSONSerialization.jsonObject(
                                                                                 with: data, options: []) as? NSDictionary {
