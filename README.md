@@ -38,6 +38,8 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 ## Notes
 
+I read the Alert Controller instruction after actually implementing the Network Error as an Alert. It is too late to change the code now.
+
 Describe any challenges encountered while building the app.
 
 Lot of code examples in CodePath and online are in a different Swift Version. Any code does not work just ‘AS-IS’ and requires updating to current Swift Version.
