@@ -10,11 +10,13 @@
 import UIKit
 import AFNetworking
 
-class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating {
     
     @IBOutlet weak var movieTableView: UITableView!
     
     var movies: [NSDictionary]?
+    var filteredMovies: [NSDictionary]?
+    var resultSearchController = UISearchController()
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
@@ -52,6 +54,11 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int
     {
+        if self.resultSearchController.isActive
+        {
+            return (self.filteredMovies?.count)!
+        }
+        
         if let movies = movies {
             return movies.count
         } else {
@@ -62,11 +69,21 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell
     {
         let cell = movieTableView.dequeueReusableCell(withIdentifier: "MovieCell") as! MovieCell
-        let movie = movies![indexPath.row]
-        let title = movie["title"] as! String
-        let overview = movie["overview"] as! String
+        
+        let movie: NSDictionary?
+        if self.resultSearchController.isActive && (filteredMovies?.count)! > 0
+        {
+            movie = filteredMovies![indexPath.row]
+        }
+        else {
+            movie = movies![indexPath.row]
+        }
+        
+        //let movie = movies![indexPath.row]
+        let title = movie?["title"] as! String
+        let overview = movie?["overview"] as! String
         let baseUrl = "http://image.tmdb.org/t/p/w500"
-        let posterPath = movie["poster_path"] as! String
+        let posterPath = movie?["poster_path"] as! String
         // let imageUrl = NSURL(string: baseUrl + posterPath)
         
         if let imageUrl = NSURL(string: baseUrl + posterPath) {
@@ -93,12 +110,58 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         return cell
     }
     
+    func updateSearchResults(for searchController: UISearchController) {
+        self.filteredMovies?.removeAll(keepingCapacity: false)
+        //let searchPredicate = NSPredicate(format: "SELF CONTAINS[c] %@", searchController.searchBar.text!)
+        // let array = (self.movies! as [NSDictionary]).filter(searchPredicate)
+        // self.filteredMovies = array as! [NSDictionary]
+        let searchString: NSString = searchController.searchBar.text! as NSString
+        
+        for item in movies! { // loop through data items
+            let obj = item as NSDictionary
+            let title = obj["title"] as! String
+            let overview = obj["overview"] as! String
+            var found: Bool? = false
+            if NSString(string: title.lowercased()).contains(searchString.lowercased as String) {
+                //filteredMovies?.append(obj)
+                found = true
+            }
+            if NSString(string: overview.lowercased()).contains(searchString.lowercased as String) {
+                //filteredMovies?.append(obj)
+                found = true
+            }
+            
+            if found! {
+                filteredMovies?.append(obj)
+            }
+        }
+
+        /*
+        for holdMovie in movies as! NSDictionary {
+            let title = holdMovie["title"] as! String
+            if NSString(string: searchString).containsString(title) {
+                filteredMovies?.append(holdMovie)
+            }
+        }
+         */
+        
+        self.movieTableView.reloadData()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
         movieTableView.dataSource = self
         movieTableView.delegate = self
+        
+        self.resultSearchController = UISearchController(searchResultsController: nil)
+        self.resultSearchController.searchResultsUpdater = self
+
+        self.resultSearchController.dimsBackgroundDuringPresentation = false
+        self.resultSearchController.searchBar.sizeToFit()
+        self.movieTableView.tableHeaderView = self.resultSearchController.searchBar
+        self.movieTableView.reloadData()
         
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: #selector(MoviesViewController.refreshControlAction(_:)), for: UIControlEvents.valueChanged)
@@ -107,7 +170,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         refreshControl.addTarget(self, action: #selector(refreshControlAction(_refreshControl:)), for: UIControlEvents.valueChanged)
         */
         movieTableView.insertSubview(refreshControl, at: 0)
-        
+        refreshControlAction(refreshControl)
 
         
         let api_key = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
@@ -126,6 +189,9 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                                                                                 with: data, options: []) as? NSDictionary {
                                                                                 NSLog("response: \(responseDirectory)")
                                                                                 self.movies = (responseDirectory["results"] as! [NSDictionary])
+                                                                                
+                                                                                self.filteredMovies = (responseDirectory["results"] as! [NSDictionary])
+                                                                                
                                                                                 self.movieTableView.reloadData()
                                                                             }
                                                                         }
